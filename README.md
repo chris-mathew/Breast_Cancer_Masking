@@ -1,2 +1,1 @@
-# Soft_Eng_Project
-AI based breast cancer investigator
+# AI based breast cancer investigator
