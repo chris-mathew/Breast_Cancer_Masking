@@ -1,9 +1,8 @@
 # AI based breast cancer investigator
 
-Agenda (Week 6):
+Agenda (Week of 19th Nov):
 
-- Review background research
-- Select working dataset
-- Set plan for algorithm
-- Set next steps for software creation
-- Organise next internal meeting
+- Download and preprocess data to create working dataset (Chris, Daniel)
+- Initial breast density classification model build (Josh, Siofra)
+- Draft user requirements presentation (Naiyira)
+  
