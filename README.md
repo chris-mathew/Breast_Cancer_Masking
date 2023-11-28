@@ -1,8 +1,10 @@
 # AI based breast cancer investigator
 
-Agenda (Week of 19th Nov):
+To Do Week of 27th Nov: 
 
-- Download and preprocess data to create working dataset (Chris, Daniel)
-- Initial breast density classification model build (Josh, Siofra)
-- Draft user requirements presentation (Naiyira)
-  
+- Complete data loader class in model
+- Continue expanding the dataset 
+- Any debugging of the model and begin to visualise results  
+- Organise meeting with Faraz to go over initial results (Probably should put together some slides) 
+- Continue to work on user requirements presentation
+- Oragnise next team meeting
