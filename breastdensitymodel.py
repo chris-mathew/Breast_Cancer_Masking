@@ -1,55 +1,83 @@
-# Initial breast density model 
-
+# Initial breast density model
 # Adapted from: https://www.frontiersin.org/articles/10.3389/fpubh.2022.885212/full#B25
-
-# Last Update: 19th Nov 2023
+# Last Update: 6th Dec 2023
 
 
 # Imports
 import os
 import pickle
 import numpy as np
-import torch 
+import torch
 import csv
-from torch import nn 
+from torch import nn
 from torch import optim
 from torch.utils.data import Dataset, DataLoader, random_split, Subset
 from torchvision import datasets, transforms
 import torchvision.models as models
 import tensorflow
 import pandas as pd
-
+from PIL import Image
+import os
 from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
 
 
-# Data Loader TO DO
+data_path = 'ADD YOUR DATA PATH HERE'
 
-# This is an example data loader slightly modified from an old project of mine
 
+# Data Loader
 class BreastImageDataset(Dataset):
-    def __init__(self, sample_data, transform, shuffle=True):
-        self.sample_data = sample_data
-        self.transform = transform 
-        self.shuffle = shuffle
+    def __init__(self, data_path, tranform=None):
+        #data path refers to the path where the folders containing the grouped images are located (ie.C:\Users\chris\OneDrive - Imperial College London\CBIS Dataset\manifest-Egq0PU078220738724328010106\CBIS-DDSM\Grouped)
+
+        self.path = data_path
+        self.transform = tranform
+        self.image_sets = [folder_name for folder_name in os.listdir(self.path)]      #Takes the folder name of each set in the folder
+
 
     def __len__(self):
-        return len(self.sample_data)
+        return len(self.image_sets)
 
-    def __getitem__(self, idx):
-        patient_features, label = self.sample_data[idx]
-           
-        if self.transform is not None:
-          patient_features = torch.from_numpy(patient_features)
-          label = torch.tensor(label, dtype=torch.int64)
-    
-        return patient_features, label
-    
+    def __getitem__(self, index):
+        image_group = self.image_sets[index]
+        image_data = []  #List of the image data for all of the views
+        image_annotation = [] #List of which view the image corresponds to
+
+        for image_name in os.listdir(os.path.join(self.path,image_group)):   #Image file names in the chosen set
+            image_path = os.path.join(self.path,image_group,image_name)
+            image_data.append(Image.open(image_path))
+
+            image_name_split = image_name.split(".")[0].split("_")   #The file name is split to obtain the direction and view of the image
+            label = image_name_split[4]
+            annotation_int = int(label)   #Converting the string label into an integer label
+            image_annotation.append(annotation_int)
+
+
+        # input_images = torch.stack(image_data)
+        input_images = torch.stack([transforms.ToTensor()(img) for img in image_data])
+        image_labels = torch.tensor(image_annotation)
+
+        if self.transform:
+            input_images = self.transform(input_images)
+
+        return input_images, image_labels
+
+
+## The proposed model performance is validated by spitting the image dataset in a ratio of 80% as training and 20% as testing
 
 # Load  train and test datasets using the data loader and split randomly
-loaded_data = BreastImageDataset(samples, transform=not None, shuffle=True) 
-train_data, test_data = random_split(loaded_data,[.8, .2]) 
-## The proposed model performance is validated by spitting the image dataset in a ratio of 80% as training and 20% as testing
+dataset = BreastImageDataset(data_path)
+
+# Split 80:20
+train_size = int(0.8 * len(dataset))
+test_size = len(dataset) - train_size
+
+# Split the dataset
+train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+
+# Create data loaders for train and test datasets
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 
 
@@ -62,6 +90,7 @@ train_data, test_data = random_split(loaded_data,[.8, .2])
 # the feature map size. A combination of 4 dense blocks and transition layers converts the image size 
 # into 7 × 7 × 3, further provided to the output layer. Each layer connects to the previous stage as an 
 # input described by Equation (4): Xl=Hl([x0,x1,……,xl−1]) 
+
 # A non-linear transformation function Hl(.) is responsible for combining series output of batch normalization,
 # ReLU, pooling, and convolution operation. 
 
@@ -145,7 +174,6 @@ class CustomDenseNet(nn.Module):
         
         self.flatten = nn.Flatten()
 
-
         # Individual Dense Layers
         self.dense_L_CC = nn.Linear(input_channels, output_classes)
         self.dense_L_MLO = nn.Linear(input_channels, output_classes)
@@ -214,14 +242,14 @@ loss = nn.CrossEntropyLoss()
 
 
 # Training Loop 
-## The entire model is trained with stochastic gradient descent (SGD) algorithm using batch sizes 4 and 30 epoch on the whole dataset.
+## The entire model is trained with stochastic gradient descent (SGD) algorithm using batch sizes 4 and 30 epoch on the whole dataset
 epochs = 30 # Number of loops through data set 
 
 for epoch in range(epochs):
   losses = list() 
   accuracies = list()
   model.train() # Needed since using dropout
-  for batch in train_data: 
+  for batch in train_loader: 
     x, y =  batch #(x is input (features) and y is label)    
 
 
@@ -252,7 +280,7 @@ for epoch in range(epochs):
 losses = list()
 accuracies = list() 
 model.eval() # Set model evaluation mode since dropout is sensitive to mode
-for batch in test_data: 
+for batch in test_loader: 
     x, y =  batch 
 
     # Step 1: Forward 
@@ -267,8 +295,6 @@ for batch in test_data:
 
 print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
      
-
-
 
 
 
