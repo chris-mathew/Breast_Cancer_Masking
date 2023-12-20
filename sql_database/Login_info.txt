@@ -1,0 +1,4 @@
+Server_Admin_Login: ctrl-alt-elite
+Password: Tsnte7TF6nMZTPY
+Server_Name: ctrl-alt-elite.database.windows.net
+Database: ai_brestcancer
