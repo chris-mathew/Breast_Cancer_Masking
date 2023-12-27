@@ -98,7 +98,10 @@ class SqlConnect:  # Create an object to interact with an SQL server
         except Exception as e:
             print(e)
 
-    def get_data(self, table_name, displayed_columns=None, keys=None, top_rows=None):
+    def get_data(self, table_name, displayed_columns=None, keys=None, top_rows=None): #Get data from the SQL server
+        #displayed_columns: Input a list of the columns that you would like to get data from. This is to avoid loading unwanted data
+        #keys: A dictionary of coulmn names with their values that could set a criteria of the data you want to return. For example input {age:24} to reciveve data from people with the age of 24.
+        #top_rows: A string of the number of data you would want to return. For example if a table has a million rows and you only want the first 20 then set this variable to 20
         condition_string = ""
         if top_rows is None and displayed_columns is None:
             filter_string = "*"
@@ -140,7 +143,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         except Exception as e:
             print(e)
 
-    def get_primary_key(self, table_name):
+    def get_primary_key(self, table_name): #Get the primary key of the table which is what the table uses to identify each row (Similar to a row number)
         table_name = table_name.split(".")[1]
         find_primary_key_string = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_SCHEMA + '.' + QUOTENAME(CONSTRAINT_NAME)), 'IsPrimaryKey') = 1 AND TABLE_NAME = '{table_name}'"
         try:
@@ -152,7 +155,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         except Exception as e:
             print(e)
 
-    def get_column_names(self, table_name):
+    def get_column_names(self, table_name): #Get the names of all the columns in a table
         table_name = table_name.split(".")[1]
         get_column_string = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}';"
         try:
@@ -165,7 +168,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         except Exception as e:
             print(e)
 
-    def get_latest_key(self, table_name):
+    def get_latest_key(self, table_name): #Get the biggest value of a column using the int data type. This is useful to identify the last primary key value
         primary_key = self.get_primary_key(table_name)
         get_key_string = f"SELECT MAX({primary_key}) FROM {table_name}"
         try:
@@ -176,8 +179,10 @@ class SqlConnect:  # Create an object to interact with an SQL server
         except Exception as e:
             print(e)
 
-    def run(self, input_string):
+    def run(self, input_string,commit=False): #Run a custom SQL command
         self.cursor.execute(input_string)
+        if commit:
+            self.cursor.commit()
         data = self.cursor.fetchall()
         if data:
             return data
