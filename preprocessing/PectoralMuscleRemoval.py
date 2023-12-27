@@ -4,6 +4,12 @@ from matplotlib import pylab as pylab
 from skimage import io
 from skimage import color
 import cv2
+from skimage.draw import polygon
+from skimage.feature import canny
+from skimage.filters import sobel
+from skimage.transform import hough_line, hough_line_peaks
+
+
 def right_orient_mammogram(image):
     left_nonzero = cv2.countNonZero(image[:, 0:int(image.shape[1]/2)])
     right_nonzero = cv2.countNonZero(image[:, int(image.shape[1]/2):])
@@ -15,12 +21,11 @@ def read_image(filename):
     image = color.rgb2gray(image)
     image = right_orient_mammogram(image)
     return image
-from skimage.feature import canny
-from skimage.filters import sobel
+
 def apply_canny(image):
     canny_img = canny(image, 5)
     return sobel(canny_img)
-from skimage.transform import hough_line, hough_line_peaks
+
 def get_hough_lines(canny_img):
     h, theta, d = hough_line(canny_img)
     lines = list()
@@ -38,6 +43,7 @@ def get_hough_lines(canny_img):
             'point2': [x2, y2]
         })
     return lines
+
 def shortlist_lines(lines):
     MIN_ANGLE = 10
     MAX_ANGLE = 70
@@ -53,7 +59,7 @@ def shortlist_lines(lines):
     for i in shortlisted_lines:
         print("Angle: {:.2f}, Dist: {:.2f}".format(i['angle'], i['dist']))
     return shortlisted_lines
-from skimage.draw import polygon
+
 def remove_pectoral(shortlisted_lines):
     shortlisted_lines.sort(key = lambda x: x['dist'])
     pectoral_line = shortlisted_lines[0]
@@ -62,6 +68,7 @@ def remove_pectoral(shortlisted_lines):
     x_intercept = d/np.cos(theta)
     y_intercept = d/np.sin(theta)
     return polygon([0, 0, y_intercept], [0, x_intercept, 0])
+
 def display_image(filename):
     image = read_image(filename)
     canny_image = apply_canny(image)
