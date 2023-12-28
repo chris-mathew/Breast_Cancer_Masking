@@ -1,6 +1,9 @@
 import pyodbc
 import pandas as pd
 
+###################################################
+#### Ensure the connection is closed when done ####
+###################################################
 
 class SqlConnect:  # Create an object to interact with an SQL server
 
