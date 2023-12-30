@@ -63,7 +63,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         if not isinstance(values, list) and not isinstance(values, tuple):
             values = [values]
 
-        organized_values = []
+        organized_values = list()
         insert_string = f'INSERT INTO {table_name} ('
 
         latest_key = self.get_latest_key(table_name)
@@ -135,7 +135,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         try:
             self.cursor.execute(get_data_string)
             fetched_data = self.cursor.fetchall()
-            returned_data = []
+            returned_data = list()
             for data in fetched_data:
                 item_data = {}
                 for index in range(len(displayed_columns)):
@@ -164,7 +164,7 @@ class SqlConnect:  # Create an object to interact with an SQL server
         get_column_string = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}';"
         try:
             self.cursor.execute(get_column_string)
-            true_column_names = []
+            true_column_names = list()
             for column_name in self.cursor.fetchall():
                 true_column_names.append(column_name[0])
             return tuple(true_column_names)
