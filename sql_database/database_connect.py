@@ -53,4 +53,14 @@ class DDSMDataset(SqlConnect):
         key = {"group_id": index}
         data = super().get_data("dbo.ddsm_dataset", keys=key)
         super().close()
+        for item in range(len(data)):
+            if data[item]['direction']:
+                data[item]['direction'] = 'RIGHT'
+            else:
+                data[item]['direction'] = 'LEFT'
+            if data[item]['image_view']:
+                data[item]['image_view'] = 'MLO'
+            else:
+                data[item]['image_view'] = 'CC'
+
         return data
