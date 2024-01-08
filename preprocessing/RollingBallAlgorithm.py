@@ -1,3 +1,7 @@
+'''
+Part 1 of Pre-processing
+A. R. Beeravolu, S. Azam, M. Jonkman, B. Shanmugam, K. Kannoorpatti and A. Anwar, "Preprocessing of Breast Cancer Images to Create Datasets for Deep-CNN," in IEEE Access, vol. 9, pp. 33438-33463, 2021, doi: 10.1109/ACCESS.2021.3058773.
+'''
 import math
 import numpy
 def rolling_ball_background(array, radius, light_background=True, smoothing=True):
