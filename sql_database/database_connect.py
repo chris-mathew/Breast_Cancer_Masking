@@ -1,4 +1,6 @@
 from sql_api import SqlConnect
+from io import BytesIO
+from PIL import Image
 
 class DDSMDataset(SqlConnect):
 
@@ -64,3 +66,10 @@ class DDSMDataset(SqlConnect):
                 data[item]['image_view'] = 'CC'
 
         return data
+    
+    def view_image(self, index):
+        data = self.get_grouped_data(index)
+
+        for item in data:
+            image = Image.open(BytesIO(item['pixel_data']))
+            image.show()
