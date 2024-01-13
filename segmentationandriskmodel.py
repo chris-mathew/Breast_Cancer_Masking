@@ -67,12 +67,12 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # DataLoader
 density_image_dataset = Density_Classification_Data()
-cancer_image_dataset = Cancer_Classification_Data()
+#cancer_image_dataset = Cancer_Classification_Data()
 
 batch_train = 64
 batch_test = 64
-dataloader = DataLoader(image_dataset,batch_size=batch_train,shuffle=True)
-test_dataloader = DataLoader(image_dataset,batch_size=batch_test,shuffle=False)
+dataloader = DataLoader(density_image_dataset,batch_size=batch_train,shuffle=True)
+test_dataloader = DataLoader(density_image_dataset,batch_size=batch_test,shuffle=False)
 
 # Training loop
 epochs = 10
