@@ -27,7 +27,14 @@ class Cancer_Classification_Data(Dataset):
             for item in table_data:
                 if item['direction'] == annotation_format[number][1] and item['image_view'] == annotation_format[number][0]:
                     image_data.append(item['pixel_data'])
-                    image_annotation.append(int(item['cancer']))
+                    
+                    annotation_value = None
+                    if item['cancer'] == "BENIGN":
+                        annotation_value = 0
+                    elif item['cancer'] == "MALIGNANT":
+                        annotation_value = 1
+                    
+                    image_annotation.append(annotation_value)
 
 
         # input_images = torch.stack(image_data)

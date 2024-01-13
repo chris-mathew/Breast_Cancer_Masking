@@ -40,7 +40,7 @@ class DDSMDataset(SqlConnect):
 
                 if image_name_split[5] == "BENIGN":
                     folder_value['cancer'] = 0
-                if image_name_split[5] == "MALIGNANT":
+                elif image_name_split[5] == "MALIGNANT":
                     folder_value['cancer'] = 1
 
                 super().insert(self.table_name, [folder_value])
