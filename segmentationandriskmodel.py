@@ -50,7 +50,8 @@ class BreastCancer_CSAE(nn.Module):
         x = self.encoder_supervised(x)
 
         # Classification
-        output = self.classifier(x)
+        x = self.classifier(x)
+        output = F.softmax(x, dim=1)
         return output
 
 
