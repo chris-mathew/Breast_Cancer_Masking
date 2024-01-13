@@ -39,7 +39,7 @@ class BreastCancer_CSAE(nn.Module):
         # Fully Connected Layers for Classification
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(100 * 1 * 1, 2)  # Assuming input size 24x24 after max pooling
+            nn.Linear(24200, 64)  # input size (50 * (height - 1) * (width - 1)) after max pooling
         )
 
     def forward(self, x):
