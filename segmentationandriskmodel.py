@@ -76,14 +76,15 @@ for epoch in range(epochs):
     for inputs, labels in dataloader:
         optimizer.zero_grad()
         outputs = model(inputs)
-        loss = loss(outputs, labels)
-        loss.backward()
+        labels = torch.argmax(labels, dim=1)
+        J = loss(outputs, labels)
+        J.backward()
         optimizer.step()
 
 # Evaluate the model
 model.eval()
 with torch.no_grad():
-    for inputs, labels in test_dataloader:  # Replace with your test DataLoader
+    for inputs, labels in test_dataloader:  
         outputs = model(inputs)
         _, predicted = torch.max(outputs, 1)
         accuracy = (predicted == labels).float().mean().item()
