@@ -39,7 +39,7 @@ class BreastCancer_CSAE(nn.Module):
         # Fully Connected Layers for Classification
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(24200, 64)  # input size (50 * (height - 1) * (width - 1)) after max pooling
+            nn.Linear(24200, 2)  # input size (50 * (height - 1) * (width - 1)) after max pooling and two output layers
         )
 
     def forward(self, x):
@@ -55,6 +55,8 @@ class BreastCancer_CSAE(nn.Module):
 
 
 # Instantiate model and Define Params
+  # For MD scoring (three classes)
+  # For MT scoring (two classes)
 model = BreastCancer_CSAE()
 
 # Define loss function and optimizer
