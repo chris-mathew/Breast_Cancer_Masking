@@ -1,5 +1,5 @@
 import os
-from sql_api import SqlConnect
+from sql_database.sql_api import SqlConnect
 from io import BytesIO
 from PIL import Image
 
