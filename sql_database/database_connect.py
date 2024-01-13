@@ -64,6 +64,8 @@ class DDSMDataset(SqlConnect):
                 data[item]['image_view'] = 'MLO'
             else:
                 data[item]['image_view'] = 'CC'
+            
+            data[item]['pixel_data'] = BytesIO(data[item]['pixel_data'])
 
         return data
     
