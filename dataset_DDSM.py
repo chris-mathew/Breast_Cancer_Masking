@@ -20,7 +20,7 @@ class Cancer_Classification_Data(Dataset):
     def __getitem__(self, index):
         table_data = self.database.get_grouped_data(index)
         image_data = list()
-        image_annotation = list()
+        image_annotation = None
         annotation_format = (('MLO','LEFT'),('MLO','RIGHT'),('CC','LEFT'),('CC','RIGHT'))
         
         for number in range(len(annotation_format)):
@@ -28,13 +28,11 @@ class Cancer_Classification_Data(Dataset):
                 if item['direction'] == annotation_format[number][1] and item['image_view'] == annotation_format[number][0]:
                     image_data.append(item['pixel_data'])
                     
-                    annotation_value = None
                     if item['cancer'] == "BENIGN":
-                        annotation_value = 0
+                        image_annotation = 0
                     elif item['cancer'] == "MALIGNANT":
-                        annotation_value = 1
+                        image_annotation = 1
                     
-                    image_annotation.append(annotation_value)
 
 
         # input_images = torch.stack(image_data)
