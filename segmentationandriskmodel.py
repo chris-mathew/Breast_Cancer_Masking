@@ -5,122 +5,126 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+from torch.utils.data import DataLoader, TensorDataset
 
-# Initial Skeleton Structure
+## Improved implementation 
 
-# Convolutional Architecture
-class breastmodel(nn.Module):
+# Define Convolutional Sparese AutoEncoder model
+class BreastCancer_CSAE(nn.Module):
     def __init__(self):
-        super(breastmodel, self).__init__()
+        super(BreastCancer_CSAE, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels, 50, 7)
-        self.conv2 = nn.Conv2d(50, 50, 2)  
-        self.conv3 = nn.Conv2d(50, 50, 5)
-        self.conv4 = nn.Conv2d(50, 100, 5)
-        self.pool = nn.MaxPool2d(kernel_size=2)
-        
-        # Sparse autoencoder layers
-        self.encoder = nn.Linear(input_size, hidden_size)
-        self.decoder = nn.Linear(hidden_size, output_size)
-        
+        # Unsupervised Convolutional Layers
+        self.encoder_unsupervised = nn.Sequential(
+            nn.Conv2d(1, 50, kernel_size=7),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2),
+            nn.Conv2d(50, 50, kernel_size=2),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=5, stride=5)
+        )
+
+        # Supervised Convolutional Layers for Fine-Tuning
+        self.encoder_supervised = nn.Sequential(
+            nn.Conv2d(50, 50, kernel_size=5),
+            nn.ReLU(),
+            nn.Conv2d(50, 100, kernel_size=5),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2, stride=2)
+        )
+
+        # Fully Connected Layers for Classification
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(100 * 1 * 1, 2)  # Assuming input size 24x24 after max pooling
+        )
+
     def forward(self, x):
-        # Apply convolutional layers
-        x = F.relu(self.conv1(x))
-        x = self.pool(x)
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = self.pool(x)
-        
-        # Flatten the tensor before feeding it into the autoencoder
-        x = torch.flatten(x, 1)  # Assuming the batch size is dimension 0
-        
-        # Apply sparse autoencoder layers
-        encoded = F.relu(self.encoder(x))
-        decoded = torch.sigmoid(self.decoder(encoded))  # Using sigmoid for output
-        
-        return encoded, decoded
-    
+        # Unsupervised Encoder
+        x = self.encoder_unsupervised(x)
 
-# Sparse Autoencoder
-# class SparseAutoencoder(nn.Module):
-#     def __init__(self):
-#         super(SparseAutoencoder, self).__init__()
-#         self.N = 48000
-#         self.p = 0.01
-#         self.lamba = 1
-#         self.encoder = nn.Linear(input_size, hidden_size)
-#         self.decoder = nn.Linear(hidden_size, output_size)
-        
-#     def forward(self, x):
-#         encoded = self.encoder(x)
-#         decoded = self.decoder(encoded)
-#         return decoded
+        # Supervised Encoder
+        x = self.encoder_supervised(x)
 
-# Instantiate model and autoencoder
-model = breastmodel()
-# autoencoder = SparseAutoencoder()
-
-# Define  
-params = model.parameters() 
-optimiser = optim.Adam(model.parameters(), lr=0.001)
-loss = nn.CrossEntropyLoss() 
+        # Classification
+        output = self.classifier(x)
+        return output
 
 
 
-# Training Loop 
-epochs = 30 # Number of loops through data set 
+# Instantiate model and Define Params
+model = BreastCancer_CSAE()
 
+# Define loss function and optimizer
+loss = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+
+# Training loop
+epochs = 10
 for epoch in range(epochs):
-  losses = list() 
-  accuracies = list()
-  model.train() # Needed since using dropout
-  for i, batch in enumerate(train_loader): 
-    x, y =  batch #(x is input (features) and y is label)    
-    l = model(x) #logits 
-    J = loss(l, y) 
-    model.zero_grad() 
-    J.backward()
-    optimiser.step() 
+    for inputs, labels in dataloader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        loss = loss(outputs, labels)
+        loss.backward()
+        optimizer.step()
 
-    losses.append(J.item())
-    accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean())
+# Evaluate the model
+model.eval()
+with torch.no_grad():
+    for inputs, labels in test_dataloader:  # Replace with your test DataLoader
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+        accuracy = (predicted == labels).float().mean().item()
+
+print("Test Accuracy:", accuracy)
+
+
+
+## OLD CODE FOR EVALUATING MODEL
+
+# # Training Loop 
+# epochs = 30 # Number of loops through data set 
+
+# for epoch in range(epochs):
+#   losses = list() 
+#   accuracies = list()
+#   model.train() # Needed since using dropout
+#   for i, batch in enumerate(train_loader): 
+#     x, y =  batch #(x is input (features) and y is label)    
+#     l = model(x) #logits 
+#     J = loss(l, y) 
+#     model.zero_grad() 
+#     J.backward()
+#     optimiser.step() 
+
+#     losses.append(J.item())
+#     accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean())
     
   
-  print(f'Epoch {epoch + 1}: Training Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
+#   print(f'Epoch {epoch + 1}: Training Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
 
 
-# Validation Loops
-losses = list()
-accuracies = list() 
-model.eval() # Set model evaluation mode since dropout is sensitive to mode
-for batch in test_loader: 
-    x, y =  batch 
+# # Validation Loops
+# losses = list()
+# accuracies = list() 
+# model.eval() # Set model evaluation mode since dropout is sensitive to mode
+# for batch in test_loader: 
+#     x, y =  batch 
 
-    # Step 1: Forward 
-    with torch.no_grad(): 
-      l = model(x)  # Just compute final outcome (no recording gradients etc) 
+#     # Step 1: Forward 
+#     with torch.no_grad(): 
+#       l = model(x)  # Just compute final outcome (no recording gradients etc) 
 
-    # Step 2: Compute Objective Function 
-    J = loss(l, y) 
+#     # Step 2: Compute Objective Function 
+#     J = loss(l, y) 
 
-    losses.append(J.item())
-    accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean()) 
+#     losses.append(J.item())
+#     accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean()) 
 
-print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
+# print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
      
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -184,5 +188,3 @@ plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic Curves')
 plt.legend(loc="lower right")
 plt.show()
-
-
