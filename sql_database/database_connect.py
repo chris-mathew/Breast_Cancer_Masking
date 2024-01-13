@@ -1,12 +1,15 @@
-from sql_database.sql_api import SqlConnect
+import os
+from sql_api import SqlConnect
 from io import BytesIO
 from PIL import Image
+
 
 class DDSMDataset(SqlConnect):
 
     def __init__(self):
         self.table_name = "dbo.ddsm_dataset"
-        super().__init__(server="ctrl-alt-elite.database.windows.net", database="ai_brestcancer", username="ctrl-alt-elite", password="Tsnte7TF6nMZTPY")
+        super().__init__(server="ctrl-alt-elite.database.windows.net", database="ai_brestcancer",
+                         username="ctrl-alt-elite", password="Tsnte7TF6nMZTPY")
 
     def insert_data(self, path):
         folder_names = os.listdir(path)
@@ -32,7 +35,13 @@ class DDSMDataset(SqlConnect):
                     folder_value['image_view'] = 0
                 else:
                     folder_value['image_view'] = 1
+
                 folder_value['density'] = int(image_name_split[4])
+
+                if image_name_split[5] == "BENIGN":
+                    folder_value['cancer'] = 0
+                if image_name_split[5] == "MALIGNANT":
+                    folder_value['cancer'] = 1
 
                 super().insert(self.table_name, [folder_value])
                 print(f"{folder} has been uploaded")
@@ -51,7 +60,7 @@ class DDSMDataset(SqlConnect):
             print(e)
 
     def get_grouped_data(self, index, single=False):
-        index+=1
+        index += 1
         super().connect()
         if single:
             key = {"id": index}
@@ -68,20 +77,25 @@ class DDSMDataset(SqlConnect):
                 data[item]['image_view'] = 'MLO'
             else:
                 data[item]['image_view'] = 'CC'
-            
+
+            if data[item]['cancer']:
+                data[item]['cancer'] = "MALIGNANT"
+            else:
+                data[item]['cancer'] = "BENIGN"
+
             data[item]['pixel_data'] = Image.open(BytesIO(data[item]['pixel_data'])).convert('RGB')
-        
+
         if len(data) == 1:
             data = data[0]
         return data
-    
+
     def view_image(self, index):
         data = self.get_grouped_data(index)
 
         for item in data:
             image = Image.open(BytesIO(item['pixel_data']))
             image.show()
-    
+
     def get_length(self):
         self.connect()
         length = self._get_groupid(self.table_name)
