@@ -7,7 +7,7 @@ import torch.optim as optim
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib as plt
-from dataset_DDSM import BreastImageDataset
+from dataset_DDSM import Cancer_Classification_Data, Density_Classification_Data
 from sklearn.metrics import roc_curve, auc
 
 ## Improved implementation 
@@ -64,7 +64,9 @@ loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # DataLoader
-image_dataset = BreastImageDataset()
+density_image_dataset = Density_Classification_Data()
+cancer_image_dataset = Cancer_Classification_Data()
+
 batch_train = 64
 batch_test = 64
 dataloader = DataLoader(image_dataset,batch_size=batch_train,shuffle=True)
