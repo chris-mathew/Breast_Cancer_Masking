@@ -39,7 +39,7 @@ class BreastCancer_CSAE(nn.Module):
         # Fully Connected Layers for Classification
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(24200, 64)  # input size (50 * (height - 1) * (width - 1)) after max pooling
+            nn.Linear(24200, 4)  # output sizes: 2 for binary MT classification, 4 for density classification
         )
 
     def forward(self, x):
@@ -55,6 +55,8 @@ class BreastCancer_CSAE(nn.Module):
 
 
 # Instantiate model and Define Params
+  # For MD scoring (three classes)
+  # For MT scoring (two classes)
 model = BreastCancer_CSAE()
 
 # Define loss function and optimizer
@@ -74,67 +76,20 @@ for epoch in range(epochs):
     for inputs, labels in dataloader:
         optimizer.zero_grad()
         outputs = model(inputs)
-        loss = loss(outputs, labels)
-        loss.backward()
+        J = loss(outputs, labels)
+        J.backward()
         optimizer.step()
 
 # Evaluate the model
 model.eval()
 with torch.no_grad():
-    for inputs, labels in test_dataloader:  # Replace with your test DataLoader
+    for inputs, labels in test_dataloader:  
         outputs = model(inputs)
         _, predicted = torch.max(outputs, 1)
         accuracy = (predicted == labels).float().mean().item()
 
 print("Test Accuracy:", accuracy)
-
-
-
-## OLD CODE FOR EVALUATING MODEL
-
-# # Training Loop 
-# epochs = 30 # Number of loops through data set 
-
-# for epoch in range(epochs):
-#   losses = list() 
-#   accuracies = list()
-#   model.train() # Needed since using dropout
-#   for i, batch in enumerate(train_loader): 
-#     x, y =  batch #(x is input (features) and y is label)    
-#     l = model(x) #logits 
-#     J = loss(l, y) 
-#     model.zero_grad() 
-#     J.backward()
-#     optimiser.step() 
-
-#     losses.append(J.item())
-#     accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean())
     
-  
-#   print(f'Epoch {epoch + 1}: Training Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
-
-
-# # Validation Loops
-# losses = list()
-# accuracies = list() 
-# model.eval() # Set model evaluation mode since dropout is sensitive to mode
-# for batch in test_loader: 
-#     x, y =  batch 
-
-#     # Step 1: Forward 
-#     with torch.no_grad(): 
-#       l = model(x)  # Just compute final outcome (no recording gradients etc) 
-
-#     # Step 2: Compute Objective Function 
-#     J = loss(l, y) 
-
-#     losses.append(J.item())
-#     accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean()) 
-
-# print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
-     
-
-
 
 
 ## SOME CODE FOR PLOTTING TO CHECK MODEL PERFORMANCE (NEED TO UPDATE ACCORDINGLY)
