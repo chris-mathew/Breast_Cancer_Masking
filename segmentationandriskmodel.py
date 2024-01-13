@@ -76,7 +76,7 @@ for epoch in range(epochs):
     for inputs, labels in dataloader:
         optimizer.zero_grad()
         outputs = model(inputs)
-        labels = torch.argmax(labels, dim=1) # Ensure that the model treats lables as binary for MT classification
+        # labels = torch.argmax(labels, dim=1) if len(labels.shape) > 1 else labels # theory - ensure that the model treats lables as binary for MT classification
         J = loss(outputs, labels)
         J.backward()
         optimizer.step()
