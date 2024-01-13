@@ -1,4 +1,4 @@
-from sql_api import SqlConnect
+from sql_database.sql_api import SqlConnect
 from io import BytesIO
 from PIL import Image
 
@@ -50,9 +50,13 @@ class DDSMDataset(SqlConnect):
         except Exception as e:
             print(e)
 
-    def get_grouped_data(self, index):
+    def get_grouped_data(self, index, single=False):
+        index+=1
         super().connect()
-        key = {"group_id": index}
+        if single:
+            key = {"id": index}
+        else:
+            key = {"group_id": index}
         data = super().get_data("dbo.ddsm_dataset", keys=key)
         super().close()
         for item in range(len(data)):
@@ -65,8 +69,10 @@ class DDSMDataset(SqlConnect):
             else:
                 data[item]['image_view'] = 'CC'
             
-            data[item]['pixel_data'] = BytesIO(data[item]['pixel_data'])
-
+            data[item]['pixel_data'] = Image.open(BytesIO(data[item]['pixel_data'])).convert('RGB')
+        
+        if len(data) == 1:
+            data = data[0]
         return data
     
     def view_image(self, index):
@@ -75,3 +81,9 @@ class DDSMDataset(SqlConnect):
         for item in data:
             image = Image.open(BytesIO(item['pixel_data']))
             image.show()
+    
+    def get_length(self):
+        self.connect()
+        length = self._get_groupid(self.table_name)
+        self.close()
+        return int(length)
