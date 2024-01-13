@@ -16,7 +16,7 @@ class BreastCancer_CSAE(nn.Module):
 
         # Unsupervised Convolutional Layers
         self.encoder_unsupervised = nn.Sequential(
-            nn.Conv2d(1, 50, kernel_size=7),
+            nn.Conv2d(3, 50, kernel_size=7),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(50, 50, kernel_size=2),
@@ -49,7 +49,6 @@ class BreastCancer_CSAE(nn.Module):
         # Classification
         output = self.classifier(x)
         return output
-
 
 
 # Instantiate model and Define Params
@@ -125,7 +124,6 @@ print("Test Accuracy:", accuracy)
 
 # print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
      
-
 
 
 
