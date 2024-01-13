@@ -5,6 +5,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 import matplotlib as plt
 from dataset_DDSM import BreastImageDataset
