@@ -6,6 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
+import matplotlib as plt
+from dataset_DDSM import BreastImageDataset
+from sklearn.metrics import roc_curve, auc
 
 ## Improved implementation 
 
@@ -58,6 +61,12 @@ model = BreastCancer_CSAE()
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+# DataLoader
+image_dataset = BreastImageDataset()
+batch_train = 64
+batch_test = 64
+dataloader = DataLoader(image_dataset,batch_size=batch_train,shuffle=True)
+test_dataloader = DataLoader(image_dataset,batch_size=batch_test,shuffle=False)
 
 # Training loop
 epochs = 10
@@ -166,7 +175,6 @@ y_true = np.array(y_true)
 y_score = np.array(y_score)
 
 
-from sklearn.metrics import roc_curve, auc
 fpr = dict()
 tpr = dict()
 auc_score = dict()
