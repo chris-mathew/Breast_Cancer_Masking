@@ -1,5 +1,6 @@
 
-## Model based on "Unsupervised deep learning applied to breast density segmentation and mammographic risk scoring"  Kallenberg et. Al 
+## Model Architecture based on "Unsupervised deep learning applied to breast density segmentation and mammographic risk scoring"  Kallenberg et. Al 2021
+## Model input is novel, considering all four mammogram image views
 
 import torch
 import torch.nn as nn
@@ -10,15 +11,13 @@ from torch.utils.data import DataLoader, TensorDataset
 import matplotlib as plt
 from dataset_DDSM import Cancer_Classification_Data, Density_Classification_Data
 from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
-## Improved implementation 
-
-# Define Convolutional Sparese AutoEncoder model
 class BreastCancer_CSAE(nn.Module):
     def __init__(self):
         super(BreastCancer_CSAE, self).__init__()
 
-        # Unsupervised Convolutional Layers
+        # Unsupervised Convolutional Layer (Patch & Encoding)
         self.encoder_unsupervised = nn.Sequential(
             nn.Conv3d(4, 50, kernel_size=(1,7,7)),
             nn.ReLU(),
@@ -28,7 +27,7 @@ class BreastCancer_CSAE(nn.Module):
             nn.MaxPool3d(kernel_size=(1,5,5), stride=(1,5,5))
         )
 
-        # Supervised Convolutional Layers for Fine-Tuning
+        # Supervised Convolutional Layers (Fine Tune)
         self.encoder_supervised = nn.Sequential(
             nn.Conv3d(50, 50, kernel_size=(1,5,5)),
             nn.ReLU(),
@@ -37,7 +36,7 @@ class BreastCancer_CSAE(nn.Module):
             nn.MaxPool3d(kernel_size=(1,2,2), stride=(1,2,2))
         )
 
-        # Fully Connected Layers for Classification
+        # Fully Connected Layers (Classify)
         self.classifier = nn.Sequential(
             nn.Flatten(),
             nn.Linear(24200, 4)  # output sizes: 2 for binary MT classification, 4 for density classification
@@ -65,7 +64,7 @@ model = BreastCancer_CSAE()
 loss = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-# DataLoader
+# DataLoader (density labelled and cancer labelled datasets)
 density_image_dataset = Density_Classification_Data()
 #cancer_image_dataset = Cancer_Classification_Data()
 
@@ -74,8 +73,18 @@ batch_test = 64
 dataloader = DataLoader(density_image_dataset,batch_size=batch_train,shuffle=True)
 test_dataloader = DataLoader(density_image_dataset,batch_size=batch_test,shuffle=False)
 
+
+# Initilaise evaluation metrics
+train_loss_history = []  
+train_acc_history = []
+val_acc_history = [] 
+val_loss_history = []
+train_acc = 0.0 
+val_acc = 0.0
+val_loss = 0.0
+
 # Training loop
-epochs = 10
+epochs = 5
 for epoch in range(epochs):
     for inputs, labels in dataloader:
         optimizer.zero_grad()
@@ -84,20 +93,36 @@ for epoch in range(epochs):
         J.backward()
         optimizer.step()
 
-# Evaluate the model
+        _, predicted = torch.max(outputs, 1)
+        train_acc += (predicted == labels).float().mean().item()
+        train_acc_history.append(train_acc)  
+        train_loss_history.append(J.item()) 
+
+
+    # print(f'Epoch {epoch + 1}/{epochs}, Training Accuracy: {train_acc:.4f}, Training Loss: {J:.4f}')
+
+
+# Evaluate the model    
 model.eval()
 with torch.no_grad():
     for inputs, labels in test_dataloader:  
         outputs = model(inputs)
         _, predicted = torch.max(outputs, 1)
         accuracy = (predicted == labels).float().mean().item()
+        val_acc += accuracy
+        val_loss += loss(outputs, labels).item()
 
-print("Test Accuracy:", accuracy)
+        # Record validation accuracy and loss
+        val_acc_history.append(val_acc)  
+        val_loss_history.append(val_loss)  
+
+val_acc = val_acc*100
+print(f'Validation Accuracy: {val_acc:.4f}, Validation Loss: {val_loss:.4f}')
+
     
 
-
-## SOME CODE FOR PLOTTING TO CHECK MODEL PERFORMANCE (NEED TO UPDATE ACCORDINGLY)
-
+# Evaluation Metrics 
+    
 # Plot the validation accuracy
 plt.plot(val_acc_history, label='Validation Accuracy', color='blue')
 plt.xlabel('Epoch')
@@ -118,9 +143,10 @@ plt.plot(val_loss_history, label='Validation Loss', color='purple')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
-
 plt.show()
 
+
+# TO DO: UPDATE ROC CURVE COMPUTATION
 
 # Compute ROC curve and AUC score
 y_true = []
