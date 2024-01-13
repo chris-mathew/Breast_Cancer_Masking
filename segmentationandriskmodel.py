@@ -21,7 +21,7 @@ class BreastCancer_CSAE(nn.Module):
         self.encoder_unsupervised = nn.Sequential(
             nn.Conv3d(4, 50, kernel_size=(1,7,7)),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=(1,2,2)),
+            nn.MaxPool3d(kernel_size=2, stride=(1,2,2)),
             nn.Conv3d(50, 50, kernel_size=(1,2,2)),
             nn.ReLU(),
             nn.MaxPool3d(kernel_size=(1,5,5), stride=(1,5,5))
