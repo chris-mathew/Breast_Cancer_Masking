@@ -19,21 +19,21 @@ class BreastCancer_CSAE(nn.Module):
 
         # Unsupervised Convolutional Layers
         self.encoder_unsupervised = nn.Sequential(
-            nn.Conv2d(3, 50, kernel_size=7),
+            nn.Conv3d(4, 50, kernel_size=(1,7,7)),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(50, 50, kernel_size=2),
+            nn.MaxPool2d(kernel_size=2, stride=(1,2,2)),
+            nn.Conv3d(50, 50, kernel_size=(1,2,2)),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=5, stride=5)
+            nn.MaxPool3d(kernel_size=(1,5,5), stride=(1,5,5))
         )
 
         # Supervised Convolutional Layers for Fine-Tuning
         self.encoder_supervised = nn.Sequential(
-            nn.Conv2d(50, 50, kernel_size=5),
+            nn.Conv3d(50, 50, kernel_size=(1,5,5)),
             nn.ReLU(),
-            nn.Conv2d(50, 100, kernel_size=5),
+            nn.Conv3d(50, 100, kernel_size=(1,5,5)),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=2, stride=2)
+            nn.MaxPool3d(kernel_size=(1,2,2), stride=(1,2,2))
         )
 
         # Fully Connected Layers for Classification
