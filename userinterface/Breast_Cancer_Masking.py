@@ -11,7 +11,7 @@ st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
 file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'dcm'], accept_multiple_files=False)
 
 categories = {
-    'B-IRADS Category': ['A', 'B', 'C', 'D'],
+    'B-IRADS Category': ('A', 'B', 'C', 'D'),
     'Description': ['Almost Entirely Fat', 'Scattered Fibroglandular Densities', 'Heterogeneously Dense', 'Extremely Dense'],
     'Cancer Risk': ['Negligible risk Of Cancer', 'Low Risk of Cancer', 'Likely Cancer', 'High Risk of Cancer']
 }
@@ -31,15 +31,18 @@ if file is not None:
         image = dicom_to_image(file)
     else:
         image = Image.open(file)
+    
+    classifcation_density, classifcation_cancer = get_classification()
+    
     st.header('MRI Image:')
     st.image(image, caption="Uploaded Image", use_column_width=True)
     st.header("BI-RADS Classification:")
     st.write("Using our machine learning model to determine BIR-RADS classification")
-
+    
     st.markdown(
-        """
+        f"""
         <div style='text-align: center;'>
-            <h1>B</h1>
+            <h1>{classifcation_density}</h1>
         </div>
         """, unsafe_allow_html=True)
     

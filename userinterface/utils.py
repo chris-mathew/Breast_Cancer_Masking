@@ -22,3 +22,7 @@ def get_extension(name):
     format_name = name.split('.')[-1]
     return format_name
 
+def get_classification(image_data):
+    pass
+
+
