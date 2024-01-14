@@ -138,7 +138,7 @@ y_true = []
 y_score = []
 with torch.no_grad():
     for inputs, labels in test_dataloader:
-        y_pred = model(inputs)
+        _, y_pred = torch.max(model(inputs),1)
         y_true.append(labels.numpy())
         y_score.append(y_pred.numpy())
 y_true = np.array(y_true)
@@ -154,8 +154,8 @@ for i in range(8):
 
 # Plot ROC curve
 plt.figure()
-for i in range(8):
-    plt.plot(fpr[i], tpr[i], label='Class %d (AUC = %0.2f)' % (i, auc_score[i]))
+for i in range(4):
+    plt.plot(fpr[i], tpr[i], label='BIRADS Score %d (AUC = %0.2f)' % (i, auc_score[i]))
 plt.plot([0, 1], [0, 1], color='black', linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
