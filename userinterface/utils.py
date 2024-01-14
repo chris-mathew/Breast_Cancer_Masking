@@ -2,6 +2,7 @@ import pydicom
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle
 
 
 def dicom_to_image(dicom_image):
@@ -20,3 +21,4 @@ def dicom_to_image(dicom_image):
 def get_extension(name):
     format_name = name.split('.')[-1]
     return format_name
+

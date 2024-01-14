@@ -61,17 +61,6 @@ if file is not None:
 
     st.markdown(table_html, unsafe_allow_html=True)
 
-  
-    #st.markdown(
-     #   """
-      #  <div style='width: 100px; height: 100px; background-color: red;'></div>
-      #  """, unsafe_allow_html=True
-    #)
-
-
-
-# Custom HTML and CSS for white background, dark blue headers, and black text
-
 html_code = """
 <style>
     [data-testid="stAppViewContainer"] {
@@ -92,11 +81,6 @@ html_code = """
     h1,h2{
     color: #001F3F ;
     }
-
-    
-
-    
-
 </style>
 """
 
