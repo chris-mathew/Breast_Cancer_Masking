@@ -99,10 +99,7 @@ for epoch in range(epochs):
     train_loss_history.append(J.item()) 
 
 
-    # print(f'Epoch {epoch + 1}/{epochs}, Training Accuracy: {train_acc:.4f}, Training Loss: {J:.4f}')
-
-
-# Evaluate the model    
+# Evaluation of model performance   
 model.eval()
 with torch.no_grad():
     for inputs, labels in test_dataloader:  
@@ -116,22 +113,14 @@ with torch.no_grad():
         val_acc_history.append(val_acc)  
         val_loss_history.append(val_loss)  
 
-val_acc = val_acc*100
+val_acc = val_acc*100  # convert to percentage
 print(f'Validation Accuracy: {val_acc:.4f}, Validation Loss: {val_loss:.4f}')
 
     
 
 # Evaluation Metrics 
-    
-# Plot the validation accuracy
-# plt.plot(val_acc_history, label='Validation Accuracy', color='blue')
-# plt.xlabel('Epoch')
-# plt.ylabel('Accuracy')
-# plt.legend()
-# plt.show()
 
-# Print out average accuracy and standard deviation of accuracy
-# print('Average accuracy: {:.2f} %'.format(np.mean(val_acc_history)*100))
+# Standard deviation of accuracy
 print('Standard deviation of accuracy: {:.2f}'.format(np.std(val_acc_history)))
 
 
@@ -139,22 +128,18 @@ print('Standard deviation of accuracy: {:.2f}'.format(np.std(val_acc_history)))
 plt.figure()
 plt.title("Learning Curves")
 plt.plot(train_loss_history, label='Training Loss', color='blue')
-plt.plot(val_loss_history, label='Validation Loss', color='purple')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
 plt.show()
 
-
-# TO DO: UPDATE ROC CURVE COMPUTATION
-
 # Compute ROC curve and AUC score
 y_true = []
 y_score = []
 with torch.no_grad():
-    for batch_idx, (x, y) in enumerate(test_dataloader):
-        y_pred = model(x)
-        y_true.append(y.numpy())
+    for inputs, labels in test_dataloader:
+        y_pred = model(inputs)
+        y_true.append(labels.numpy())
         y_score.append(y_pred.numpy())
 y_true = np.array(y_true)
 y_score = np.array(y_score)
