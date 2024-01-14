@@ -1,64 +1,102 @@
+#Initialisation
 import streamlit as st
+import pandas as pd
+from PIL import Image
 
-# Custom HTML and CSS for linear gradient background
 
-def test():
+st.set_page_config(page_title='BI-RADS Score Determiner')
+
+st.title('BI-RADS Score Determiner')
+st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
+file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'DICOM'], accept_multiple_files=False)
+
+categories = {
+    'B-IRADS Category': ['A', 'B', 'C', 'D'],
+    'Description': ['Almost Entirely Fat', 'Scattered Fibroglandular Densities', 'Heterogeneously Dense', 'Extremely Dense'],
+    'Cancer Risk': ['Negligible risk Of Cancer', 'Low Risk of Cancer', 'Likely Cancer', 'High Risk of Cancer']
+}
+
+df = pd.DataFrame(categories)
+
+# Convert the DataFrame to HTML
+table_html = df.to_html(index=False)
+
+# Add custom styles to the header
+table_html = table_html.replace('<th>', '<th style="text-align:left; font-weight:bold;">')
+
+
+
+if file is not None:
+    image = Image.open(file)
+
+    st.header('MRI Image:')
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+    st.header("BI-RADS Classification:")
+    st.write("Using our machine learning model to determine BIR-RADS classification")
+
     st.markdown(
         """
-        <div id="cookies-popup" style="
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            text-align: center;
-        ">
-            <p>This website uses cookies to ensure you get the best experience.</p>
-            <button onclick="acceptCookies()">Accept Cookies</button>
+        <div style='text-align: center;'>
+            <h1>B</h1>
         </div>
-        <script>
-            function acceptCookies() {
-                // Remove the popup from the DOM
-                var cookiesPopup = document.getElementById('cookies-popup');
-                cookiesPopup.parentNode.removeChild(cookiesPopup);
-                // Set a session state variable to remember that the user has accepted cookies
-                Streamlit.setComponentValue(true, 'accepted_cookies');
-            }
-        </script>
-        """,
-        unsafe_allow_html=True,
-    )
+        """, unsafe_allow_html=True)
+    
+    st.write("")
+    st.header("Cancer Risk")
+    st.write("Using BI-RADS Score to determine the level of cancer risk")
+
+    st.markdown(
+        """
+        <div style='text-align: center;'>
+            <h1>High</h1>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    st.write("")
+
+    st.header("BI-RADS Classifications Explained:")
+    st.write("Please use the table below to identify the risk factor assosciated with the BI-RADS Score.")
+
+    st.markdown(table_html, unsafe_allow_html=True)
+
+  
+    #st.markdown(
+     #   """
+      #  <div style='width: 100px; height: 100px; background-color: red;'></div>
+      #  """, unsafe_allow_html=True
+    #)
+
+
+
+# Custom HTML and CSS for white background, dark blue headers, and black text
 
 html_code = """
 <style>
-
-  
     [data-testid="stAppViewContainer"] {
-        background: linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.25) 200%);
-        background-blend-mode: multiply;
-        background-size: cover;
+        background-color: white; /* Set background color to white */
         height: 100vh;
         margin: 0; /* Remove default margin */
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        color: white; /* Set text color to contrast with the background */
+        color: black ; /* Set text color to black */
     }
-    
-    [data-testid="stHeader"] {
 
-	}
+    [data-testid="stHeader"] {
+        background-color: #001F3F; /* Set header background color to dark blue */
+        color: black; /* Set header text color to black */
+    }
+
+    h1,h2{
+    color: #001F3F ;
+    }
+
     
+
     
+
 </style>
 """
 
 # Render the HTML
-#st.markdown(html_code, unsafe_allow_html=True)
-
-# Streamlit content
-st.title("Streamlit with Linear Gradient Background")
-st.write("This is an example of Streamlit with a linear gradient background.")
+st.markdown(html_code, unsafe_allow_html=True)
