@@ -34,8 +34,6 @@ class Cancer_Classification_Data(Dataset):
                         image_annotation = 1
                     
 
-
-        # input_images = torch.stack(image_data)
         input_images = torch.stack([transforms.ToTensor()(img) for img in image_data])
         image_labels = torch.tensor(image_annotation)
 
@@ -66,7 +64,6 @@ class Density_Classification_Data(Dataset):
                     image_annotation = item['density']-1
 
 
-        # input_images = torch.stack(image_data)
         input_images = torch.stack([transforms.ToTensor()(img) for img in image_data])
         image_labels = torch.tensor(image_annotation)
 

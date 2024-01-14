@@ -10,9 +10,9 @@ sql = SqlConnect(server="ctrl-alt-elite.database.windows.net", database="ai_bres
                  password="Tsnte7TF6nMZTPY")
 
 sql.connect()
-path = "C:/Users/chris/OneDrive - Imperial College London/CBIS Dataset/manifest-Egq0PU078220738724328010106/CBIS-DDSM/Grouped"
+path = "C:/Users/chris/OneDrive - Imperial College London/CBIS Dataset/manifest-Egq0PU078220738724328010106/CBIS-DDSM/Grouped" #path to the data which is a set of folders containing the 4 different views
 
-folder_names = os.listdir(path)
+folder_names = os.listdir(path) #
 values = []
 group_id = 0
 
