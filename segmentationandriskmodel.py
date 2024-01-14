@@ -95,8 +95,8 @@ for epoch in range(epochs):
 
         _, predicted = torch.max(outputs, 1)
         train_acc += (predicted == labels).float().mean().item()
-        train_acc_history.append(train_acc)  
-        train_loss_history.append(J.item()) 
+    train_acc_history.append(train_acc)  
+    train_loss_history.append(J.item()) 
 
 
     # print(f'Epoch {epoch + 1}/{epochs}, Training Accuracy: {train_acc:.4f}, Training Loss: {J:.4f}')
@@ -124,14 +124,14 @@ print(f'Validation Accuracy: {val_acc:.4f}, Validation Loss: {val_loss:.4f}')
 # Evaluation Metrics 
     
 # Plot the validation accuracy
-plt.plot(val_acc_history, label='Validation Accuracy', color='blue')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
+# plt.plot(val_acc_history, label='Validation Accuracy', color='blue')
+# plt.xlabel('Epoch')
+# plt.ylabel('Accuracy')
+# plt.legend()
+# plt.show()
 
 # Print out average accuracy and standard deviation of accuracy
-print('Average accuracy: {:.2f} %'.format(np.mean(val_acc_history)*100))
+# print('Average accuracy: {:.2f} %'.format(np.mean(val_acc_history)*100))
 print('Standard deviation of accuracy: {:.2f}'.format(np.std(val_acc_history)))
 
 
@@ -152,7 +152,7 @@ plt.show()
 y_true = []
 y_score = []
 with torch.no_grad():
-    for batch_idx, (x, y) in enumerate(test_data):
+    for batch_idx, (x, y) in enumerate(test_dataloader):
         y_pred = model(x)
         y_true.append(y.numpy())
         y_score.append(y_pred.numpy())
