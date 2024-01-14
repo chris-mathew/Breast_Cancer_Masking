@@ -16,3 +16,7 @@ def dicom_to_image(dicom_image):
     image_rgb = (image_rgb[:, :, :3] * 255).astype(np.uint8)
     
     return Image.fromarray(image_rgb)
+
+def get_extension(name):
+    format_name = name.split('.')[-1]
+    return format_name

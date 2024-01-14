@@ -1,14 +1,14 @@
-#Initialisation
 import streamlit as st
 import pandas as pd
 from PIL import Image
+from utils import *
 
 
 st.set_page_config(page_title='BI-RADS Score Determiner')
 
 st.title('BI-RADS Score Determiner')
 st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
-file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'DICOM'], accept_multiple_files=False)
+file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'dcm'], accept_multiple_files=False)
 
 categories = {
     'B-IRADS Category': ['A', 'B', 'C', 'D'],
@@ -27,8 +27,10 @@ table_html = table_html.replace('<th>', '<th style="text-align:left; font-weight
 
 
 if file is not None:
-    image = Image.open(file)
-
+    if get_extension(file.name) == "dcm":
+        image = dicom_to_image(file)
+    else:
+        image = Image.open(file)
     st.header('MRI Image:')
     st.image(image, caption="Uploaded Image", use_column_width=True)
     st.header("BI-RADS Classification:")
