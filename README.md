@@ -68,13 +68,15 @@ Link to demo: https://www.crtl-alt-elite.online/
     ```
 
 9. Deploy the streamlit app to Heroku
-    This is a useful link that walks step by step through deployment: https://gilberttanner.com/blog/deploying-your-streamlit-dashboard-with-heroku/
+
+   This is a useful link that walks step by step through deployment: https://gilberttanner.com/blog/deploying-your-streamlit-dashboard-with-heroku/
+
    For this you can refer to `requirements.txt`, `setup.sh`, and `Procfile`
 
 
 ## Usage
 
-1. Upload mammogram images using the drag-and-drop tile in the user interface.
+1. Upload mammogram images using the drag-and-drop tile in the user interface linked at https://www.crtl-alt-elite.online/
 2. View breast density measurement and estimated cancer risk.
 
 ## Future Improvements
