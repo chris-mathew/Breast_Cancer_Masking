@@ -1,142 +1,126 @@
 
-## Model based on "Unsupervised deep learning applied to breast density segmentation and mammographic risk scoring"  Kallenberg et. Al 
+## Model Architecture based on "Unsupervised deep learning applied to breast density segmentation and mammographic risk scoring"  Kallenberg et. Al 2021
+## Model input is novel, considering all four mammogram image views
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
+import torch.nn.functional as F
+from torch.utils.data import DataLoader, TensorDataset
+import matplotlib as plt
+from dataset_DDSM import Cancer_Classification_Data, Density_Classification_Data
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
-# Initial Skeleton Structure
-
-# Convolutional Architecture
-class breastmodel(nn.Module):
+class BreastCancer_CSAE(nn.Module):
     def __init__(self):
-        super(breastmodel, self).__init__()
+        super(BreastCancer_CSAE, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels, 50, 7)
-        self.conv2 = nn.Conv2d(50, 50, 2)  
-        self.conv3 = nn.Conv2d(50, 50, 5)
-        self.conv4 = nn.Conv2d(50, 100, 5)
-        self.pool = nn.MaxPool2d(kernel_size=2)
-        
-        # Sparse autoencoder layers
-        self.encoder = nn.Linear(input_size, hidden_size)
-        self.decoder = nn.Linear(hidden_size, output_size)
-        
+        # Unsupervised Convolutional Layer (Patch & Encoding)
+        self.encoder_unsupervised = nn.Sequential(
+            nn.Conv3d(4, 50, kernel_size=(1,7,7)),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=2, stride=(1,2,2)),
+            nn.Conv3d(50, 50, kernel_size=(1,2,2)),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(1,5,5), stride=(1,5,5))
+        )
+
+        # Supervised Convolutional Layers (Fine Tune)
+        self.encoder_supervised = nn.Sequential(
+            nn.Conv3d(50, 50, kernel_size=(1,5,5)),
+            nn.ReLU(),
+            nn.Conv3d(50, 100, kernel_size=(1,5,5)),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(1,2,2), stride=(1,2,2))
+        )
+
+        # Fully Connected Layers (Classify)
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(24200, 4)  # output sizes: 2 for binary MT classification, 4 for density classification
+        )
+
     def forward(self, x):
-        # Apply convolutional layers
-        x = F.relu(self.conv1(x))
-        x = self.pool(x)
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = self.pool(x)
-        
-        # Flatten the tensor before feeding it into the autoencoder
-        x = torch.flatten(x, 1)  # Assuming the batch size is dimension 0
-        
-        # Apply sparse autoencoder layers
-        encoded = F.relu(self.encoder(x))
-        decoded = torch.sigmoid(self.decoder(encoded))  # Using sigmoid for output
-        
-        return encoded, decoded
-    
+        # Unsupervised Encoder
+        x = self.encoder_unsupervised(x)
 
-# Sparse Autoencoder
-# class SparseAutoencoder(nn.Module):
-#     def __init__(self):
-#         super(SparseAutoencoder, self).__init__()
-#         self.N = 48000
-#         self.p = 0.01
-#         self.lamba = 1
-#         self.encoder = nn.Linear(input_size, hidden_size)
-#         self.decoder = nn.Linear(hidden_size, output_size)
-        
-#     def forward(self, x):
-#         encoded = self.encoder(x)
-#         decoded = self.decoder(encoded)
-#         return decoded
+        # Supervised Encoder
+        x = self.encoder_supervised(x)
 
-# Instantiate model and autoencoder
-model = breastmodel()
-# autoencoder = SparseAutoencoder()
-
-# Define  
-params = model.parameters() 
-optimiser = optim.Adam(model.parameters(), lr=0.001)
-loss = nn.CrossEntropyLoss() 
+        # Classification
+        x = self.classifier(x)
+        output = F.softmax(x, dim=1)
+        return output
 
 
+# Instantiate model and Define Params
+  # For MD scoring (three classes)
+  # For MT scoring (two classes)
+model = BreastCancer_CSAE()
 
-# Training Loop 
-epochs = 30 # Number of loops through data set 
+# Define loss function and optimizer
+loss = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
+# DataLoader (density labelled and cancer labelled datasets)
+density_image_dataset = Density_Classification_Data()
+#cancer_image_dataset = Cancer_Classification_Data()
+
+batch_train = 64
+batch_test = 64
+dataloader = DataLoader(density_image_dataset,batch_size=batch_train,shuffle=True)
+test_dataloader = DataLoader(density_image_dataset,batch_size=batch_test,shuffle=False)
+
+
+# Initilaise evaluation metrics
+train_loss_history = []  
+train_acc_history = []
+val_acc_history = [] 
+val_loss_history = []
+train_acc = 0.0 
+val_acc = 0.0
+val_loss = 0.0
+
+# Training loop
+epochs = 5
 for epoch in range(epochs):
-  losses = list() 
-  accuracies = list()
-  model.train() # Needed since using dropout
-  for i, batch in enumerate(train_loader): 
-    x, y =  batch #(x is input (features) and y is label)    
-    l = model(x) #logits 
-    J = loss(l, y) 
-    model.zero_grad() 
-    J.backward()
-    optimiser.step() 
+    for inputs, labels in dataloader:
+        optimizer.zero_grad()
+        outputs = model(inputs)
+        J = loss(outputs, labels)
+        J.backward()
+        optimizer.step()
 
-    losses.append(J.item())
-    accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean())
+        _, predicted = torch.max(outputs, 1)
+        train_acc += (predicted == labels).float().mean().item()
+    train_acc_history.append(train_acc)  
+    train_loss_history.append(J.item()) 
+
+
+# Evaluation of model performance   
+model.eval()
+with torch.no_grad():
+    for inputs, labels in test_dataloader:  
+        outputs = model(inputs)
+        _, predicted = torch.max(outputs, 1)
+        accuracy = (predicted == labels).float().mean().item()
+        val_acc += accuracy
+        val_loss += loss(outputs, labels).item()
+
+        # Record validation accuracy and loss
+        val_acc_history.append(val_acc)  
+        val_loss_history.append(val_loss)  
+
+val_acc = val_acc*100  # convert to percentage
+print(f'Validation Accuracy: {val_acc:.4f}, Validation Loss: {val_loss:.4f}')
+
     
-  
-  print(f'Epoch {epoch + 1}: Training Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
 
+# Evaluation Metrics 
 
-# Validation Loops
-losses = list()
-accuracies = list() 
-model.eval() # Set model evaluation mode since dropout is sensitive to mode
-for batch in test_loader: 
-    x, y =  batch 
-
-    # Step 1: Forward 
-    with torch.no_grad(): 
-      l = model(x)  # Just compute final outcome (no recording gradients etc) 
-
-    # Step 2: Compute Objective Function 
-    J = loss(l, y) 
-
-    losses.append(J.item())
-    accuracies.append(y.eq(l.detach().argmax().cpu()).float().mean()) 
-
-print(f'Final Values: Validation Loss = {torch.tensor(losses).mean():.2f}, Accuracy = {torch.tensor(accuracies).mean():.2f}')
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## SOME CODE FOR PLOTTING TO CHECK MODEL PERFORMANCE (NEED TO UPDATE ACCORDINGLY)
-
-# Plot the validation accuracy
-plt.plot(val_acc_history, label='Validation Accuracy', color='blue')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.show()
-
-# Print out average accuracy and standard deviation of accuracy
-print('Average accuracy: {:.2f} %'.format(np.mean(val_acc_history)*100))
+# Standard deviation of accuracy
 print('Standard deviation of accuracy: {:.2f}'.format(np.std(val_acc_history)))
 
 
@@ -144,27 +128,23 @@ print('Standard deviation of accuracy: {:.2f}'.format(np.std(val_acc_history)))
 plt.figure()
 plt.title("Learning Curves")
 plt.plot(train_loss_history, label='Training Loss', color='blue')
-plt.plot(val_loss_history, label='Validation Loss', color='purple')
 plt.xlabel('Epoch')
 plt.ylabel('Loss')
 plt.legend()
-
 plt.show()
-
 
 # Compute ROC curve and AUC score
 y_true = []
 y_score = []
 with torch.no_grad():
-    for batch_idx, (x, y) in enumerate(test_data):
-        y_pred = model(x)
-        y_true.append(y.numpy())
+    for inputs, labels in test_dataloader:
+        _, y_pred = torch.max(model(inputs),1)
+        y_true.append(labels.numpy())
         y_score.append(y_pred.numpy())
 y_true = np.array(y_true)
 y_score = np.array(y_score)
 
 
-from sklearn.metrics import roc_curve, auc
 fpr = dict()
 tpr = dict()
 auc_score = dict()
@@ -174,8 +154,8 @@ for i in range(8):
 
 # Plot ROC curve
 plt.figure()
-for i in range(8):
-    plt.plot(fpr[i], tpr[i], label='Class %d (AUC = %0.2f)' % (i, auc_score[i]))
+for i in range(4):
+    plt.plot(fpr[i], tpr[i], label='BIRADS Score %d (AUC = %0.2f)' % (i, auc_score[i]))
 plt.plot([0, 1], [0, 1], color='black', linestyle='--')
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.05])
@@ -184,5 +164,3 @@ plt.ylabel('True Positive Rate')
 plt.title('Receiver Operating Characteristic Curves')
 plt.legend(loc="lower right")
 plt.show()
-
-
