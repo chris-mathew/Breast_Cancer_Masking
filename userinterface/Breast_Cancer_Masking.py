@@ -55,9 +55,9 @@ if file is not None:
     st.write("Using BI-RADS Score to determine the level of cancer risk")
 
     st.markdown(
-        """
+        f"""
         <div style='text-align: center;'>
-            <h1>High</h1>
+            <h1>{classifcation_cancer}</h1>
         </div>
         """, unsafe_allow_html=True)
     
