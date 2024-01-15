@@ -62,13 +62,6 @@ This project aims to develop an AI-based breast cancer screening system. It incl
 2. View breast density measurements, BIRADS classification, and estimated cancer risk.
 3. Explore the BIRADS classifications section for detailed information.
 
-## Future Improvements
-
-- Implement a preprocessing pipeline for improved model accuracy.
-- Expand the dataset to enhance model training.
-- ...
-
-
 
 
 
