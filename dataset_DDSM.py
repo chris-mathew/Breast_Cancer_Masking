@@ -8,7 +8,7 @@ from torchvision import transforms
 from sql_database.database_connect import DDSMDataset
 
 
-
+#Dataset that uses cancerous state for the annotation
 class Cancer_Classification_Data(Dataset):
     def __init__(self, tranform=None):
         self.transform = tranform
@@ -42,7 +42,7 @@ class Cancer_Classification_Data(Dataset):
 
         return input_images, image_labels
     
-    
+ #Dataset that uses density values for the annotation
 class Density_Classification_Data(Dataset):
     def __init__(self, tranform=None):
         self.transform = tranform

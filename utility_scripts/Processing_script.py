@@ -10,8 +10,7 @@ def dicom_to_png(dicom_path, png_path):
     dicom_data = pydicom.dcmread(dicom_path)
 
     pixel_data = dicom_data.pixel_array
-    pixel_data = pixel_data - np.min(pixel_data)
-    pixel_data = pixel_data / np.max(pixel_data)
+    pixel_data = (pixel_data - np.min(pixel_data))/ np.max(pixel_data)
 
     rgb_image = plt.cm.gray(pixel_data)
     #Adding RGB channels to the image
@@ -20,14 +19,12 @@ def dicom_to_png(dicom_path, png_path):
     Image.fromarray(rgb_image).save(png_path)
 
 
+# Image resize function to ensure images are consistent
 def resize_image(path_in, size):
-    # Open the image file
     original_image = Image.open(path_in)
 
-    # Resize the image
     resized_image = original_image.resize(size)
 
-    # Save the resized image
     resized_image.save(path_in)
 
 
@@ -35,8 +32,9 @@ path = "C:/Users/chris/OneDrive - Imperial College London/CBIS Dataset/manifest-
 folder_names = os.listdir(path)
 size_new = (320,320)
 
+#Scans throught the local dataset folder
 for folder in folder_names:
     input_path = path + '/' + folder
     output_path = path + '/' + 'Reformatted' + '/' + folder[:-4] + '.png'  #PNG IMAGES ARE CREATED IN A FOLDER CALLED "Reformatted"
-    dicom_to_png(input_path, output_path) #DICOM is convere
+    dicom_to_png(input_path, output_path) #DICOM is convereted to a png format
     resize_image(output_path, size_new)

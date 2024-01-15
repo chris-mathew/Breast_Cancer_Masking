@@ -8,6 +8,7 @@ st.set_page_config(page_title='BI-RADS Score Determiner')
 
 st.title('BI-RADS Score Determiner')
 st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
+#Takes in a file that is either a JPEG, PNG or DICOM file
 file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'dcm'], accept_multiple_files=False)
 
 categories = {
@@ -25,8 +26,9 @@ table_html = df.to_html(index=False)
 table_html = table_html.replace('<th>', '<th style="text-align:left; font-weight:bold;">')
 
 
-
+#If a while is uploaded
 if file is not None:
+    #Image data is extracted from the dicom file
     if get_extension(file.name) == "dcm":
         image = dicom_to_image(file)
     else:
@@ -39,6 +41,7 @@ if file is not None:
     st.header("BI-RADS Classification:")
     st.write("Using our machine learning model to determine BIR-RADS classification")
     
+    #Display the classification results
     st.markdown(
         f"""
         <div style='text-align: center;'>
@@ -86,6 +89,5 @@ html_code = """
     }
 </style>
 """
-
-# Render the HTML
+#Display the HTML code
 st.markdown(html_code, unsafe_allow_html=True)

@@ -3,14 +3,14 @@ from sql_database.sql_api import SqlConnect
 from io import BytesIO
 from PIL import Image
 
-
+#A sub class of the SQLConnect class that is specefic to the DDSM dataset
 class DDSMDataset(SqlConnect):
 
     def __init__(self):
         self.table_name = "dbo.ddsm_dataset"
         super().__init__(server="ctrl-alt-elite.database.windows.net", database="ai_brestcancer",
                          username="ctrl-alt-elite", password="Tsnte7TF6nMZTPY")
-
+#Insert data as a list with column names
     def insert_data(self, path):
         folder_names = os.listdir(path)
         super().connect()
@@ -47,7 +47,7 @@ class DDSMDataset(SqlConnect):
                 print(f"{folder} has been uploaded")
 
         super().close()
-
+#Get the latest group id
     def _get_groupid(self, table_name):
         column_name = "group_id"
         get_key_string = f"SELECT MAX({column_name}) FROM {table_name}"
@@ -58,7 +58,7 @@ class DDSMDataset(SqlConnect):
                 return max_key[0][0]
         except Exception as e:
             print(e)
-
+#Get an individual patient's data that includes images of all four view. If single is set to true then it would only return an individual image
     def get_grouped_data(self, index, single=False):
         index += 1
         super().connect()
@@ -69,6 +69,7 @@ class DDSMDataset(SqlConnect):
         data = super().get_data("dbo.ddsm_dataset", keys=key)
         super().close()
         for item in range(len(data)):
+            #Converting BIT values to their string equivalent
             if data[item]['direction']:
                 data[item]['direction'] = 'RIGHT'
             else:
@@ -82,20 +83,21 @@ class DDSMDataset(SqlConnect):
                 data[item]['cancer'] = "MALIGNANT"
             else:
                 data[item]['cancer'] = "BENIGN"
-
+            
+            #Image output is converted from string to Bytes
             data[item]['pixel_data'] = Image.open(BytesIO(data[item]['pixel_data'])).convert('RGB')
 
         if len(data) == 1:
             data = data[0]
         return data
-
+#View an image on the database using PIL
     def view_image(self, index):
         data = self.get_grouped_data(index)
 
         for item in data:
             image = Image.open(BytesIO(item['pixel_data']))
             image.show()
-
+#Get the number of patiens
     def get_length(self):
         self.connect()
         length = self._get_groupid(self.table_name)
