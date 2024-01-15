@@ -37,7 +37,7 @@ if file is not None:
     st.markdown(
         """
         <div style='text-align: center;'>
-            <h1>3</h1>
+            <h1>1</h1>
         </div>
         """, unsafe_allow_html=True)
     
@@ -48,7 +48,7 @@ if file is not None:
     st.markdown(
         """
         <div style='text-align: center;'>
-            <h1>High</h1>
+            <h1>No Cancer</h1>
         </div>
         """, unsafe_allow_html=True)
     
