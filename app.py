@@ -11,7 +11,7 @@ st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
 file = st.file_uploader('Upload Picture', type=['JPEG', 'PNG', 'DICOM'], accept_multiple_files=False)
 
 categories = {
-    'B-IRADS Category': ['0', '1', '2', '3'],
+    'B-IRADS Category': ['A', 'B', 'C', 'D'],
     'Description': ['Almost Entirely Fat', 'Scattered Fibroglandular Densities', 'Heterogeneously Dense', 'Extremely Dense'],
     'Cancer Risk': ['Negligible risk Of Cancer', 'Low Risk of Cancer', 'Likely Cancer', 'High Risk of Cancer']
 }
