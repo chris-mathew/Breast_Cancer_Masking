@@ -2,7 +2,7 @@
 
 This project aims to develop an AI-based breast cancer screening system. It includes components for pre-processing, SQL server, APIs, machine learning model trained on DDOS publically available dataset, user interface, and deployment to create a successful Breast Cancer Desnity and Breast Cancer Risk Assessment program.
 
-Link to the project: https://www.crtl-alt-elite.online/
+Link to the demo: https://www.crtl-alt-elite.online/
 
 
 ## Folder Structure
