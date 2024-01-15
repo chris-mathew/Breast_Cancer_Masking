@@ -1,6 +1,7 @@
 # Breast Cancer Screening Project
 
-This project aims to develop an AI-based breast cancer screening system. It includes components for breast density estimation, BIRADS classification, mammogram analysis, and breast cancer risk prediction.
+This project aims to develop an AI-based breast cancer screening system. It includes components for pre-processing, SQL server, APIs, machine learning model trained on DDOS publically available dataset, user interface, and deployment to create a successful Breast Cancer Desnity and Breast Cancer Risk Assessment program.
+
 
 ## Folder Structure
 
@@ -16,22 +17,22 @@ This project aims to develop an AI-based breast cancer screening system. It incl
 
 ## Recent Updates
 
-- **Cleaning up code**: Updated code for a cleaner structure.
-- **preprocessing**: Updated `RollingBallAlgorithm.py`.
+- **User Interface**: Updated UI and deployed on heroku
+- **Preprocessing**: Finalised `RollingBallAlgorithm.py`
 
-## How to Contribute
-
-If you'd like to contribute to this project, please follow the guidelines in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Dependencies
 
 - Python 3.6 or higher
-- Streamlit 0.79.0
-- Pandas 1.2.3
+- pandas 2.1.4
+- Pillow 10.2.0
+- streamlit 1.30.0
 - NumPy 1.18.5
 - Matplotlib 3.3.2
 - Seaborn 0.11.0
 - scikit-learn 0.24.1
+- skimage 0.22.0
+- torch 2.1.2
 
 ## Getting Started
 
@@ -47,8 +48,9 @@ If you'd like to contribute to this project, please follow the guidelines in [CO
     ```bash
     pip install -r requirements.txt
     ```
+    Also individually install all missing dependencies detailed above
 
-3. Run the application:
+3. Run the various applications:
 
     ```bash
     streamlit run userinterface/app.py
@@ -58,18 +60,13 @@ If you'd like to contribute to this project, please follow the guidelines in [CO
 
 1. Upload mammogram images using the drag-and-drop tile in the user interface.
 2. View breast density measurements, BIRADS classification, and estimated cancer risk.
-3. Explore the BIRADS classifications explained section for detailed information.
+3. Explore the BIRADS classifications section for detailed information.
 
 ## Future Improvements
 
 - Implement a preprocessing pipeline for improved model accuracy.
 - Expand the dataset to enhance model training.
 - ...
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
 
 
 # AI based breast cancer investigator
