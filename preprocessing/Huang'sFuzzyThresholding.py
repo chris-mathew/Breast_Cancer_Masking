@@ -6,7 +6,7 @@ import numpy as np
 import math
 
 def huang(data):
-    print(data.shape)
+    # print(data.shape)
     threshold=-1;
     first_bin= 0
     for ih in range(254):
