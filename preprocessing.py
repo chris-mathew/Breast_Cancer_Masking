@@ -9,13 +9,13 @@ from dataset_DDSM import Cancer_Classification_Data as ccd
 def morph_trans(binarized_image, rolled_image):
     
     #erosion
-    kernel = np.ones((120,120),np.uint8)
-    erosion = cv2.erode(binarized_image,kernel,iterations = 1)
+    kernel = np.ones((5,5),np.uint8)
+    erosion = cv2.erode(binarized_image, kernel, iterations = 1)
     #dilation
-    kernel = np.ones((120,120),np.uint8)
+    kernel = np.ones((7,7),np.uint8)
     dilation = cv2.dilate(erosion, kernel, iterations = 1)
     #merging
-    merged = cv2.bitwise_and(binarized_image, rolled_image , mask=dilation)
+    merged = cv2.bitwise_and(dilation, rolled_image)
     
     return merged
 
