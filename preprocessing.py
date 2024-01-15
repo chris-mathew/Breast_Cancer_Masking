@@ -43,7 +43,7 @@ def preprocessing(image):
     
     
     #thresholding
-    threshold = hft(img_resize)
+    threshold = hft(rolled_img)
     
     #applying threshold to create binarized image
     binarized_img = cv2.threshold(rolled_img, threshold, cv2.THRESH_BINARY)
