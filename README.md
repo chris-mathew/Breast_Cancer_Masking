@@ -2,8 +2,7 @@
 
 This project aims to develop an AI-based breast cancer screening system. It includes components for pre-processing, SQL server, APIs, machine learning model trained on DDOS publically available dataset, user interface, and deployment to create a successful Breast Cancer Desnity and Breast Cancer Risk Assessment program.
 
-Link to the demo: https://www.crtl-alt-elite.online/
-
+Link to demo: https://www.crtl-alt-elite.online/
 
 ## Folder Structure
 
@@ -13,9 +12,9 @@ Link to the demo: https://www.crtl-alt-elite.online/
 - `sql_database`: SQL database related files.
 - `userinterface`: User interface components.
 - `utility_scripts`: Scripts for utility functions.
-- `breastdensitymodel.py`: Python file for breast density model.
+- `breastdensitymodel.py`: First Python file for first prototype of breast density model.
 - `dataset_DDSM.py`: Python file for handling the DDSM dataset.
-- `segmentationandriskmodel.py`: Python file for segmentation and risk prediction.
+- `segmentationandriskmodel.py`: Final Python file for final version of segmentation and risk prediction.
 
 ## Recent Updates
 
@@ -35,6 +34,7 @@ Link to the demo: https://www.crtl-alt-elite.online/
 - scikit-learn 0.24.1
 - skimage 0.22.0
 - torch 2.1.2
+- pyodbc
 
 ## Getting Started
 
@@ -46,25 +46,42 @@ Link to the demo: https://www.crtl-alt-elite.online/
     ```
 
 2. Install dependencies:
+   Individually install all missing dependencies detailed above
 
+3. Install the DDSM dataset, as shown in `dataset_DDSM.py`
+
+4. Run the `preprocessing` on the dataset
+
+5. Train the model in `segmentationandriskmodel.py` with the processed data 
+   
+6. Export the model via pickle or torch
+   
+7. Run the User interface code
+   This is in the main folder due to needing to store it in the root folder so it worked effectively with heroku.
+
+   For the user interface, you need to run `app.py`
+
+   If you want to edit the application and re-run it, use the code below:
+   
     ```bash
-    pip install -r requirements.txt
+    streamlit run app.py
     ```
-    Also individually install all missing dependencies detailed above
 
-3. Run the various applications:
+9. Deploy the streamlit app to Heroku
+    This is a useful link that walks step by step through deployment: https://gilberttanner.com/blog/deploying-your-streamlit-dashboard-with-heroku/
+   For this you can refer to `requirements.txt`, `setup.sh`, and `Procfile`
 
-    ```bash
-    streamlit run userinterface/app.py
-    ```
 
 ## Usage
 
 1. Upload mammogram images using the drag-and-drop tile in the user interface.
-2. View breast density measurements, BIRADS classification, and estimated cancer risk.
-3. Explore the BIRADS classifications section for detailed information.
+2. View breast density measurement and estimated cancer risk.
 
+## Future Improvements
 
-
+- Factor in breast assymetry.
+- Expand the dataset to enhance model training.
+- Continous model training
+- Integrating clinical data with data protection and security as a priority.
 
 
