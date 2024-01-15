@@ -3,6 +3,7 @@ import pandas as pd
 from PIL import Image
 from utils import *
 
+#This webpage can be viewed at https://www.crtl-alt-elite.online/
 
 st.set_page_config(page_title='BI-RADS Score Determiner')
 
