@@ -4,7 +4,7 @@ import pandas as pd
 from PIL import Image
 
 
-st.set_page_config(page_title='BI-RADS Score Determiner')
+#st.set_page_config(page_title='BI-RADS Score Determiner')
 
 st.title('BI-RADS Score Determiner')
 st.write("Please upload a mammogram image below to recieve a BI-RADS value.")
