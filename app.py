@@ -29,7 +29,7 @@ table_html = table_html.replace('<th>', '<th style="text-align:left; font-weight
 if file is not None:
     image = Image.open(file)
 
-    st.header('MRI Image:')
+    st.header('Mammogram Image:')
     st.image(image, caption="Uploaded Image", use_column_width=True)
     st.header("BI-RADS Classification:")
     st.write("Using our machine learning model to determine BIR-RADS classification")
